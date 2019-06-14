@@ -1,0 +1,35 @@
+version: 2
+jobs:
+   build-linux:
+     docker:
+       - image: golang:1.12
+     steps:
+       - checkout
+       - run:
+           name: Build & Test
+           command: ./pleasew test
+       - store_test_results:
+           path: plz-out/log/test_results.xml
+
+   build-darwin:
+      macos:
+        xcode: "9.0"
+     steps:
+       - checkout
+       - run:
+           name: Install Go
+           command: ./.circleci/setup_osx.sh
+       - run:
+           name: Build & Test
+           command: ./pleasew test
+       - store_test_results:
+           path: plz-out/log/test_results.xml
+
+workflows:
+  version: 2
+  build-all:
+    jobs:
+      - build-linux
+      - build-darwin:
+          requires:
+            - build-linux
