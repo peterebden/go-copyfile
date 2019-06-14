@@ -52,7 +52,7 @@ func TestCopy(t *testing.T) {
 	assertNoError(t, err)
 	b, err = ioutil.ReadFile("test_data/test.txt")
 	assertNoError(t, err)
-	assertNotEqual(t, b, b2)
+	assertNotEqual(t, []byte("testing"), b)
 }
 
 func TestIsSameFile(t *testing.T) {

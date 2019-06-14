@@ -16,6 +16,21 @@ cgo_test(
     ],
 )
 
+go_library(
+    name = "copyfile_generic",
+    srcs = ["copier.go", "cow_other.go"],
+)
+
+go_test(
+    name = "copy_generic_test",
+    srcs = ["copy_test.go"],
+    data = ["test_data"],
+    deps = [
+        ":copyfile",
+#        ":testify",
+    ],
+)   
+
 go_get(
     name = "spew",
     get = "github.com/davecgh/go-spew/spew",
