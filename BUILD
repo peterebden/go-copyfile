@@ -1,14 +1,18 @@
-go_library(
+cgo_library(
     name = "copyfile",
-    srcs = glob(["*.go"], exclude=["*_test.go"]),
+    srcs = [
+        "cow_linux.go" if CONFIG.OS == "linux" else "cow_darwin.go" if CONFIG.OS == "darwin" else "cow_other.go",
+    ],
+    go_srcs = ["copier.go"],
 )
 
-go_test(
+cgo_test(
     name = "copy_test",
     srcs = ["copy_test.go"],
     data = ["test_data"],
     deps = [
-        ":testify",
+        ":copyfile",
+#        ":testify",
     ],
 )
 
