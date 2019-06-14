@@ -13,6 +13,12 @@ func assertNoError(t *testing.T, err error) {
 	}
 }
 
+func assertError(t *testing.T, err error) {
+	if err == nil {
+		t.Errorf("Unexpected success")
+	}
+}
+
 func assertEqual(t *testing.T, b1, b2 []byte) {
 	if !bytes.Equal(b1, b2) {
 		t.Errorf("Unexpectedly not equal: %s %s", b1, b2)
@@ -38,10 +44,10 @@ func assertFalse(t *testing.T, b bool) {
 }
 
 func TestCopy(t *testing.T) {
-	b, err := ioutil.ReadFile("test_data/test.txt")
+	b, err := ioutil.ReadFile("test_data/input.txt")
 	assertNoError(t, err)
 	var c Copier
-	err = c.Copy("test_data/test.txt", "test_data/test2.txt")
+	err = c.Copy("test_data/input.txt", "test_data/test2.txt")
 	assertNoError(t, err)
 	b2, err := ioutil.ReadFile("test_data/test2.txt")
 	assertNoError(t, err)
@@ -50,13 +56,42 @@ func TestCopy(t *testing.T) {
 	// any circumstances.
 	err = ioutil.WriteFile("test_data/test2.txt", []byte("testing"), 0644)
 	assertNoError(t, err)
-	b, err = ioutil.ReadFile("test_data/test.txt")
+	b, err = ioutil.ReadFile("test_data/input.txt")
 	assertNoError(t, err)
 	assertNotEqual(t, []byte("testing"), b)
 }
 
+func TestCopyGeneric(t *testing.T) {
+	b, err := ioutil.ReadFile("test_data/input.txt")
+	assertNoError(t, err)
+	c := Copier{Generic: true}
+	err = c.Copy("test_data/input.txt", "test_data/test3.txt")
+	assertNoError(t, err)
+	b2, err := ioutil.ReadFile("test_data/test3.txt")
+	assertNoError(t, err)
+	assertEqual(t, b, b2)
+}
+
+func TestCopyNonExistingFile(t *testing.T) {
+	var c Copier
+	err := c.Copy("test_data/doesnt_exist.txt", "test_data/test4.txt")
+	assertError(t, err)
+}
+
+func TestCopyToNonWritableFile(t *testing.T) {
+	var c Copier
+	err := c.Copy("test_data/input.txt", "test_data/readonly.txt")
+	assertError(t, err)
+}
+
+func TestLink(t *testing.T) {
+	var c Copier
+	err := c.Link("test_data/input.txt", "test_data/test5.txt")
+	assertNoError(t, err)
+}
+
 func TestIsSameFile(t *testing.T) {
 	var c Copier
-	assertTrue(t, c.IsSameFile("test_data/test.txt", "test_data/test.txt"))
-	assertFalse(t, c.IsSameFile("test_data/test.txt", "test_data"))
+	assertTrue(t, c.IsSameFile("test_data/input.txt", "test_data/input.txt"))
+	assertFalse(t, c.IsSameFile("test_data/input.txt", "test_data"))
 }

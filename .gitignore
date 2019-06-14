@@ -1,5 +1,4 @@
 # Please output directory
 plz-out
 # Test files ('go test' will create this, plz will not)
-test_data/test2.txt
-
+test_data/test*.txt
