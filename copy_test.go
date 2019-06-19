@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -54,9 +53,8 @@ func TestCopyNonExistingFile(t *testing.T) {
 }
 
 func TestCopyToNonWritableFile(t *testing.T) {
-	if runtime.GOOS == "darwin" {
-		t.Skip("not currently working as expected on OSX, unsure why")
-	}
+	// Ensure permissions are right, this seems to lose them after git clone?
+	os.Chmod("test_data/readonly.txt", 0444)
 	var c Copier
 	err := c.Copy("test_data/input.txt", "test_data/readonly.txt")
 	assert.Error(t, err)
