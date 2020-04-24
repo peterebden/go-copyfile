@@ -83,6 +83,12 @@ func (c *Copier) WriteFile(r io.Reader, dest string, mode os.FileMode) error {
 
 // Link hard-links a file from src to dest, falling back to a copy if the link fails.
 func (c *Copier) Link(src, dest string) error {
+	return c.LinkMode(src, dest, 0644)
+}
+
+// LinkMode hard-links a file from src to dest, falling back to a copy with the given mode if the link fails.
+// The mode obviously does not apply if the file is linked.
+func (c *Copier) LinkMode(src, dest string, mode os.FileMode) error {
 	if err := os.Link(src, dest); err == nil {
 		return nil
 	} else if runtime.GOOS != "linux" && os.IsNotExist(err) {
@@ -98,7 +104,7 @@ func (c *Copier) Link(src, dest string) error {
 		}
 		return err
 	}
-	return c.Copy(src, dest)
+	return c.CopyMode(src, dest, mode)
 }
 
 // IsSameFile returns true if the two given paths refer to the same file.
